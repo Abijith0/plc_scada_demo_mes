@@ -49,5 +49,25 @@ graph TD
 
     PLC -- Raw Tag Data --> OPC
     OPC -- OPC UA Protocol --> IG
+```
+graph LR
+    subgraph Tag Provider
+        Tags[Live Tags: CV, PV, MOTOR]
+    end
+    subgraph Historian Engine
+        Hist[SQL Historian Suite]
+        UD[Unified Dataset]
+    end
+    subgraph Perspective HMI
+        UI[Live Status Indicators]
+        Chart[Time Series Chart]
+        Controls[Operator Control Panel]
+    end
+
+    Tags -- Live Data --> Hist
+    Hist -- Historical Queries --> UD
+    UD --> Chart
+    Tags -- Live Value Bindings --> UI
+    Controls -. Bidirectional Control .-> Tags
     IG -- Exception Logging --> DB
     IG -- HTTPS / WebSockets --> HMI
