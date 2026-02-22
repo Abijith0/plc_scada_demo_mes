@@ -27,47 +27,24 @@ The system simulates a scalable smart factory data pipeline aligned with Industr
 
 ## 🏗 System Architecture
 
-### 1️⃣ Network Architecture (OT → IT Data Flow)
+### 1️⃣ Hardware & Network Architecture (Distributed PC Setup)
+This diagram outlines the physical hardware separation, proving network routing capability between the field OT layer and the supervisory IT layer.
 
 ```mermaid
 graph TD
-    subgraph Control Layer
+    subgraph PC 1: Field Operations (OT)
         PLC[CODESYS Virtual PLC]
-    end
-    subgraph Middleware
         OPC[Kepware OPC UA Server]
+        PLC -- Raw Tag Data --> OPC
     end
-    subgraph SCADA Layer
+
+    subgraph PC 2: Supervisory Control (IT)
         IG[Ignition 8.3 Gateway]
-    end
-    subgraph Storage Layer
         DB[(MySQL Database)]
-    end
-    subgraph Presentation Layer
         HMI[Perspective Web Client]
+        
+        IG -- Exception Logging --> DB
+        IG -- WebSockets / HTTPS --> HMI
     end
 
-    PLC -- Raw Tag Data --> OPC
-    OPC -- OPC UA Protocol --> IG
-```
-graph LR
-    subgraph Tag Provider
-        Tags[Live Tags: CV, PV, MOTOR]
-    end
-    subgraph Historian Engine
-        Hist[SQL Historian Suite]
-        UD[Unified Dataset]
-    end
-    subgraph Perspective HMI
-        UI[Live Status Indicators]
-        Chart[Time Series Chart]
-        Controls[Operator Control Panel]
-    end
-
-    Tags -- Live Data --> Hist
-    Hist -- Historical Queries --> UD
-    UD --> Chart
-    Tags -- Live Value Bindings --> UI
-    Controls -. Bidirectional Control .-> Tags
-    IG -- Exception Logging --> DB
-    IG -- HTTPS / WebSockets --> HMI
+    OPC -- OPC UA Protocol via LAN --> IG
